@@ -16,7 +16,7 @@ TEMPLATE = """
 <form method="POST">
   Name: <input name="name"><br>
   Phone: <input name="phone"><br>
-  Appointment (YYYY-MM-DD HH:MM): <input name="appointment"><br>
+  Appointment: <input type="datetime-local" name="appointment"><br>
   <button type="submit">Add</button>
 </form>
 """
@@ -26,7 +26,7 @@ def home():
     if request.method == "POST":
         name = request.form["name"]
         phone = request.form["phone"]
-        appointment_time = datetime.strptime(request.form["appointment"], "%Y-%m-%d %H:%M")
+        appointment_time = datetime.strptime(request.form["appointment"], "%Y-%m-%dT%H:%M")
         db.session.add(Appointment(name=name, phone=phone, appointment_time=appointment_time))
         db.session.commit()
         return "Appointment added!"
