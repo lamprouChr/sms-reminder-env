@@ -4,3 +4,4 @@ python-dotenv
 SQLAlchemy
 twilio
 schedule
+Flask-SQLAlchemy
