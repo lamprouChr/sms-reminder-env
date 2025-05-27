@@ -5,3 +5,4 @@ SQLAlchemy
 twilio
 schedule
 Flask-SQLAlchemy
+flask-migrate
