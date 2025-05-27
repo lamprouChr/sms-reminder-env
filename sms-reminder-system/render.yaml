@@ -3,7 +3,7 @@ services:
     name: sms-web
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: flask db upgrade && gunicorn app:app
     envVars:
       - fromGroup: sms-reminder-env
 
