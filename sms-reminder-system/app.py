@@ -3,12 +3,12 @@ from datetime import datetime
 from models import db, Appointment
 from dotenv import load_dotenv
 import os
+from flask_migrate import Migrate  # Add this import
 
 load_dotenv()
 
 app = Flask(__name__)
 
-# Get DATABASE_URL from environment or fallback to local SQLite
 database_url = os.getenv("DATABASE_URL")
 if database_url is None:
     print("DATABASE_URL: None, using local SQLite fallback")
@@ -20,6 +20,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+migrate = Migrate(app, db)  # Initialize migration support here
 
 TEMPLATE = """
 <h2>Add Appointment</h2>
