@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Appointment</title>
+    <title>Appointment Scheduler</title>
 </head>
 <body>
-    <h1>Add Appointment</h1>
+    <h2>Add Appointment</h2>
     <form method="POST">
-        <label>Name:</label><br>
-        <input type="text" name="name" required><br><br>
-
-        <label>Phone (+123456789):</label><br>
-        <input type="text" name="phone" required><br><br>
-
-        <label>Date (YYYY-MM-DD):</label><br>
-        <input type="text" name="date" required><br><br>
-
-        <button type="submit">Add Appointment</button>
+      Name: <input name="name"><br>
+      Phone: <input name="phone"><br>
+      Appointment: <input type="datetime-local" name="appointment"><br>
+      <button type="submit">Add</button>
     </form>
+    <hr>
+    <h3>Saved Appointments:</h3>
+    <ul>
+      {% for a in appointments %}
+        <li>
+          {{ a.name }} - {{ a.phone }} - {{ a.appointment_time }}
+          <form method="POST" action="/delete/{{ a.id }}" style="display:inline;">
+            <button type="submit">Delete</button>
+          </form>
+        </li>
+      {% else %}
+        <li>No appointments yet.</li>
+      {% endfor %}
+    </ul>
 </body>
 </html>
