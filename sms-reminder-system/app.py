@@ -4,6 +4,7 @@ from models import db, Appointment
 from dotenv import load_dotenv
 import os
 from flask_migrate import Migrate  # Add this import
+from twilio.rest import Client
 
 load_dotenv()
 #fsdfd
@@ -42,6 +43,34 @@ def home():
         db.session.add(Appointment(name=name, phone=phone, appointment_time=appointment_time))
         db.session.commit()
         return "Appointment added!"
+
+
+
+#$gsdgsdgsd
+#fasfasfsa
+
+    @app.route("/test-sms")
+    def test_sms():
+        # Your Twilio credentials (put them in .env and load them securely!)
+        account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+        auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+        twilio_phone = os.getenv("TWILIO_PHONE_NUMBER")  # Your Twilio number
+        to_phone = os.getenv("MY_PHONE_NUMBER")  # Your personal phone number for testing
+
+        if not all([account_sid, auth_token, twilio_phone, to_phone]):
+            return "Twilio credentials or phone numbers not configured properly."
+
+        try:
+            client = Client(account_sid, auth_token)
+            message = client.messages.create(
+                body="Hello from your Flask app! Twilio test message.",
+                from_=twilio_phone,
+                to=to_phone
+            )
+            return f"Message sent! SID: {message.sid}"
+        except Exception as e:
+            return f"Failed to send message: {e}"
+
 
     # Fetch all appointments from DB
     appointments = Appointment.query.all()
