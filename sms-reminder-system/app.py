@@ -39,6 +39,7 @@ def home():
         name = request.form["name"]
         phone = request.form["phone"]
         appointment_time = datetime.strptime(request.form["appointment"], "%Y-%m-%dT%H:%M")
+        appointment_time = appointment_datetime.date()
         db.session.add(Appointment(name=name, phone=phone, appointment_time=appointment_time))
         db.session.commit()
         return "Appointment added!"
