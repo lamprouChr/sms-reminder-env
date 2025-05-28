@@ -42,7 +42,29 @@ def home():
         db.session.add(Appointment(name=name, phone=phone, appointment_time=appointment_time))
         db.session.commit()
         return "Appointment added!"
-    return render_template_string(TEMPLATE)
+
+    # Fetch all appointments from DB
+    appointments = Appointment.query.all()
+
+    # Render form AND appointment list
+    return render_template_string("""
+    <h2>Add Appointment</h2>
+    <form method="POST">
+      Name: <input name="name"><br>
+      Phone: <input name="phone"><br>
+      Appointment: <input type="datetime-local" name="appointment"><br>
+      <button type="submit">Add</button>
+    </form>
+    <hr>
+    <h3>Saved Appointments:</h3>
+    <ul>
+      {% for a in appointments %}
+        <li>{{ a.name }} - {{ a.phone }} - {{ a.appointment_time }}</li>
+      {% else %}
+        <li>No appointments yet.</li>
+      {% endfor %}
+    </ul>
+    """, appointments=appointments)
 
 if __name__ == "__main__":
     app.run(debug=True)
