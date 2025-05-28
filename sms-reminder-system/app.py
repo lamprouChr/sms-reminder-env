@@ -6,7 +6,7 @@ import os
 from flask_migrate import Migrate  # Add this import
 
 load_dotenv()
-
+#fsdfd
 app = Flask(__name__)
 
 database_url = os.getenv("DATABASE_URL")
