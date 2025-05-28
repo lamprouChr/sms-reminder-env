@@ -1,15 +1,14 @@
 from flask import Flask, request, render_template, redirect, url_for
-
 from datetime import datetime
 from models import db, Appointment
 from dotenv import load_dotenv
 import os
-from flask_migrate import Migrate  # Add this import
+from flask_migrate import Migrate  
 from twilio.rest import Client
-from datetime import timedelta  # Already imported datetime
+from datetime import timedelta  
 
 load_dotenv()
-#fsdfd
+
 app = Flask(__name__)
 
 database_url = os.getenv("DATABASE_URL")
@@ -24,7 +23,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-migrate = Migrate(app, db)  # Initialize migration support here
+migrate = Migrate(app, db) 
 
 TEMPLATE = """
 <h2>Add Appointment</h2>
@@ -36,7 +35,7 @@ TEMPLATE = """
 </form>
 """
 
-# Twilio setup (add this in app.py near the top)
+
 TWILIO_SID = os.getenv("TWILIO_SID")
 TWILIO_AUTH = os.getenv("TWILIO_AUTH")
 TWILIO_PHONE = os.getenv("TWILIO_PHONE")
@@ -66,9 +65,6 @@ def delete_appointment(id):
     return redirect(url_for("home"))
 
 
-
-
-
 def send_sms(name, phone):
     client.messages.create(
         to=phone,
@@ -91,7 +87,6 @@ def trigger_sms():
         send_sms(appt.name, appt.phone)
 
     return f"Sent {len(appointments)} SMS reminder(s)."
-
 
 
 
