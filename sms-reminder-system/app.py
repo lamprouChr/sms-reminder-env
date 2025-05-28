@@ -1,10 +1,12 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template, redirect, url_for
+
 from datetime import datetime
 from models import db, Appointment
 from dotenv import load_dotenv
 import os
 from flask_migrate import Migrate  # Add this import
 from twilio.rest import Client
+from datetime import timedelta  # Already imported datetime
 
 load_dotenv()
 #fsdfd
@@ -34,6 +36,14 @@ TEMPLATE = """
 </form>
 """
 
+# Twilio setup (add this in app.py near the top)
+TWILIO_SID = os.getenv("TWILIO_SID")
+TWILIO_AUTH = os.getenv("TWILIO_AUTH")
+TWILIO_PHONE = os.getenv("TWILIO_PHONE")
+client = Client(TWILIO_SID, TWILIO_AUTH)
+
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
@@ -42,35 +52,48 @@ def home():
         appointment_time = datetime.strptime(request.form["appointment"], "%Y-%m-%dT%H:%M")
         db.session.add(Appointment(name=name, phone=phone, appointment_time=appointment_time))
         db.session.commit()
-        return "Appointment added!"
+        return redirect(url_for("home"))
 
-
-
-#$gsdgsdgsd
-#fasfasfsa
-
-    # Fetch all appointments from DB
     appointments = Appointment.query.all()
+    return render_template("add_appointment.html", appointments=appointments)
 
-    # Render form AND appointment list
-    return render_template_string("""
-    <h2>Add Appointment</h2>
-    <form method="POST">
-      Name: <input name="name"><br>
-      Phone: <input name="phone"><br>
-      Appointment: <input type="datetime-local" name="appointment"><br>
-      <button type="submit">Add</button>
-    </form>
-    <hr>
-    <h3>Saved Appointments:</h3>
-    <ul>
-      {% for a in appointments %}
-        <li>{{ a.name }} - {{ a.phone }} - {{ a.appointment_time }}</li>
-      {% else %}
-        <li>No appointments yet.</li>
-      {% endfor %}
-    </ul>
-    """, appointments=appointments)
+
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete_appointment(id):
+    appointment = Appointment.query.get_or_404(id)
+    db.session.delete(appointment)
+    db.session.commit()
+    return redirect(url_for("home"))
+
+
+
+
+
+def send_sms(name, phone):
+    client.messages.create(
+        to=phone,
+        from_=TWILIO_PHONE,
+        body=f"Reminder: You have an appointment tomorrow, {name}!"
+    )
+
+@app.route("/trigger-sms")
+def trigger_sms():
+    tomorrow = datetime.now() + timedelta(days=1)
+    start = datetime(tomorrow.year, tomorrow.month, tomorrow.day)
+    end = start + timedelta(days=1)
+
+    appointments = Appointment.query.filter(
+        Appointment.appointment_time >= start,
+        Appointment.appointment_time < end
+    ).all()
+
+    for appt in appointments:
+        send_sms(appt.name, appt.phone)
+
+    return f"Sent {len(appointments)} SMS reminder(s)."
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
