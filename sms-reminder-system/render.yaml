@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sms-web
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: flask db upgrade && gunicorn app:app
+    envVars:
+      - fromGroup: sms-reminder-env
+
+  - type: worker
+    name: sms-scheduler
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scheduler.py
+    schedule: "@daily"
+    envVars:
+      - fromGroup: sms-reminder-env
